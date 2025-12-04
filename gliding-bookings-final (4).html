@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deeside Gliding Club - Flight Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1976d2;
+            --primary-light: #42a5f5;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-300: #e0e0e0;
+            --gray-400: #bdbdbd;
+            --gray-500: #9e9e9e;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+            --border: #e0e0e0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --hour-height: 60px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .controls {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-light);
+        }
+
+        .week-display {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .calendar-wrapper {
+            background: white;
+            margin: 0;
+            overflow: auto;
+            height: calc(100vh - 200px);
+        }
+
+        .calendar-container {
+            display: flex;
+            min-width: 1200px;
+        }
+
+        .time-column {
+            width: 80px;
+            flex-shrink: 0;
+            background: var(--gray-50);
+            border-right: 2px solid var(--border);
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+
+        .day-columns {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(140px, 1fr));
+            flex: 1;
+        }
+
+        .day-header-row {
+            display: contents;
+        }
+
+        .time-header-spacer {
+            height: 60px;
+            border-bottom: 2px solid var(--border);
+            background: var(--gray-50);
+        }
+
+        .day-header {
+            padding: 12px 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border-bottom: 2px solid var(--border);
+            border-right: 1px solid var(--border);
+            background: var(--gray-50);
+            text-align: center;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-header.today {
+            background: #e3f2fd;
+            color: var(--primary);
+        }
+
+        .day-name {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .day-header.today .day-name {
+            color: var(--primary);
+        }
+
+        .day-date {
+            display: block;
+            font-size: 1.25rem;
+        }
+
+        .allday-spacer {
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 1px solid var(--border);
+            min-height: 40px;
+            background: var(--gray-50);
+        }
+
+        .allday-cell {
+            padding: 4px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--gray-50);
+            min-height: 40px;
+        }
+
+        .time-slot {
+            height: var(--hour-height);
+            padding: 8px;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+            background: var(--gray-50);
+        }
+
+        .day-column {
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+
+        .day-grid {
+            position: relative;
+        }
+
+        .hour-line {
+            height: var(--hour-height);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: default;
+            overflow: hidden;
+            border-left: 3px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            background: var(--primary);
+            color: white;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .event:hover {
+            z-index: 5;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .event.instructional {
+            background: var(--warning);
+        }
+
+        .event.instructional.free {
+            border-left-color: var(--success);
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .event.instructional.free:hover {
+            background: #fb8c00;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .event.my-booking {
+            border-left-color: #2196f3;
+            box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+        }
+
+        .event.my-booking:hover {
+            box-shadow: 0 3px 8px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-cancel-inline {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel-inline:hover {
+            background: #d32f2f;
+            transform: scale(1.1);
+        }
+
+        .event.duty-pilot {
+            background: #4caf50;
+        }
+
+        .event.instructor {
+            background: #e91e63;
+        }
+
+        .event.club-event {
+            background: #9c27b0;
+        }
+
+        .event.trial-flight {
+            background: #673ab7;
+        }
+
+        .event.member {
+            background: #2196f3;
+        }
+
+        .event.visitor {
+            background: #424242;
+        }
+
+        .event.tuggie {
+            background: #00bcd4;
+        }
+
+        .event-time {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.7rem;
+        }
+
+        .event-title {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+        }
+
+        .allday-event {
+            position: relative;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+            cursor: default;
+            border-left: 3px solid rgba(0, 0, 0, 0.2);
+            background: var(--primary);
+            color: white;
+        }
+
+        .allday-event.instructional {
+            background: var(--warning);
+        }
+
+        .allday-event.duty-pilot {
+            background: #4caf50;
+        }
+
+        .allday-event.instructor {
+            background: #e91e63;
+        }
+
+        .allday-event.club-event {
+            background: #9c27b0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-600);
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-900);
+            font-size: 0.875rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-confirm {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #388e3c;
+        }
+
+        .legend {
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .day-columns {
+                grid-template-columns: repeat(7, minmax(100px, 1fr));
+            }
+
+            .time-column {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <div class="logo">✈️</div>
+                <h1>Deeside Gliding Club - Wannafly</h1>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="week-nav">
+                <button class="btn" onclick="previousWeek()">‹ Previous</button>
+                <button class="btn" onclick="goToToday()">Today</button>
+                <button class="btn" onclick="nextWeek()">Next ›</button>
+            </div>
+            <div class="week-display" id="weekDisplay"></div>
+            <button class="btn btn-primary" onclick="loadWeek()">Refresh</button>
+        </div>
+
+        <div id="calendarContainer"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: var(--warning);"></div>
+                <span>Instructional Slot (FREE = Bookable)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4caf50;"></div>
+                <span>Duty Pilot</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e91e63;"></div>
+                <span>Instructor</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #673ab7;"></div>
+                <span>Trial Flight Slot</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196f3;"></div>
+                <span>Member</span>
+            </div>
+            <div class="legend-item" style="margin-left: auto; font-style: italic; color: var(--gray-600);">
+                💡 Your bookings show an ✕ button - click to cancel
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Book Training Slot</h2>
+                <p class="modal-subtitle" id="modalSlotInfo"></p>
+            </div>
+            <div class="form-group">
+                <label for="memberName">Your Name</label>
+                <input type="text" id="memberName" placeholder="Enter your name">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-modal btn-confirm" onclick="confirmBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const CONFIG = {
+            CALENDAR_KEY: 'ks7210431db2544db2',
+            API_KEY: 'b71c716aa20611703ffd5a046fee67adb57defdccc20f424e5d96fe8567e2690',
+            START_HOUR: 9,
+            END_HOUR: 21, // 9 PM
+            HOUR_HEIGHT: 60, // pixels per hour
+        };
+
+        const API_BASE = 'https://api.teamup.com';
+        
+        let currentWeekStart = null;
+        let currentSlot = null;
+        let subcalendars = {};
+        let allEvents = [];
+
+        // ============================================
+        // LOCAL STORAGE FOR TRACKING USER BOOKINGS
+        // ============================================
+        const STORAGE_KEY = 'gliding_bookings';
+
+        function getMyBookings() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function addMyBooking(eventId, name, title) {
+            const bookings = getMyBookings();
+            bookings.push({
+                eventId: eventId,
+                name: name,
+                title: title,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+        }
+
+        function removeMyBooking(eventId) {
+            const bookings = getMyBookings();
+            const filtered = bookings.filter(b => b.eventId !== eventId);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+        }
+
+        function isMyBooking(event) {
+            const bookings = getMyBookings();
+            return bookings.find(b => b.eventId === event.id);
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function initialize() {
+            goToToday();
+            loadSubcalendars();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Monday
+            currentWeekStart = new Date(today.setDate(diff));
+            currentWeekStart.setHours(0, 0, 0, 0);
+            updateWeekDisplay();
+            loadWeek();
+        }
+
+        function previousWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+            updateWeekDisplay();
+            loadWeek();
+        }
+
+        function nextWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            updateWeekDisplay();
+            loadWeek();
+        }
+
+        function updateWeekDisplay() {
+            const weekEnd = new Date(currentWeekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            const startStr = currentWeekStart.toLocaleDateString('en-GB', options);
+            const endStr = weekEnd.toLocaleDateString('en-GB', options);
+            
+            document.getElementById('weekDisplay').textContent = `${startStr} - ${endStr}`;
+        }
+
+        // ============================================
+        // API FUNCTIONS
+        // ============================================
+        async function apiRequest(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Teamup-Token': CONFIG.API_KEY,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${CONFIG.CALENDAR_KEY}${endpoint}`, options);
+                
+                if (!response.ok) {
+                    // Try to get error details from response
+                    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error && errorData.error.message) {
+                            errorMessage += ` - ${errorData.error.message}`;
+                        }
+                    } catch (e) {
+                        // Couldn't parse error response
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Request failed:', error);
+                throw error;
+            }
+        }
+
+        async function loadSubcalendars() {
+            try {
+                const data = await apiRequest('/subcalendars');
+                data.subcalendars.forEach(sub => {
+                    subcalendars[sub.id] = sub;
+                });
+                console.log('Loaded subcalendars:', subcalendars);
+            } catch (error) {
+                console.error('Failed to load subcalendars:', error);
+            }
+        }
+
+        async function loadWeek() {
+            const container = document.getElementById('calendarContainer');
+            container.innerHTML = '<div class="loading">Loading calendar</div>';
+
+            try {
+                const weekEnd = new Date(currentWeekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+
+                const startDate = formatDateISO(currentWeekStart);
+                const endDate = formatDateISO(weekEnd);
+
+                const data = await apiRequest(`/events?startDate=${startDate}&endDate=${endDate}`);
+                allEvents = data.events || [];
+                
+                renderCalendar();
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        <strong>Error loading calendar:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // CALENDAR RENDERING
+        // ============================================
+        function renderCalendar() {
+            const container = document.getElementById('calendarContainer');
+            const days = [];
+            
+            // Generate 7 days from currentWeekStart
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(currentWeekStart);
+                day.setDate(day.getDate() + i);
+                days.push(day);
+            }
+
+            // Build time column
+            let timeColumnHtml = '<div class="time-header-spacer"></div><div class="allday-spacer">All Day</div>';
+            for (let hour = CONFIG.START_HOUR; hour < CONFIG.END_HOUR; hour++) {
+                timeColumnHtml += `<div class="time-slot">${formatHour(hour)}</div>`;
+            }
+
+            // Build day columns
+            let dayColumnsHtml = '';
+            
+            // Headers
+            days.forEach(day => {
+                const isToday = isToday_(day);
+                const dayName = day.toLocaleDateString('en-GB', { weekday: 'short' });
+                const dayDate = day.getDate();
+                dayColumnsHtml += `
+                    <div class="day-header ${isToday ? 'today' : ''}">
+                        <span class="day-name">${dayName}</span>
+                        <span class="day-date">${dayDate}</span>
+                    </div>
+                `;
+            });
+
+            // All-day row
+            days.forEach(day => {
+                const allDayEvents = getAllDayEventsForDay(day);
+                dayColumnsHtml += `<div class="allday-cell">${renderAllDayEvents(allDayEvents)}</div>`;
+            });
+
+            // Day columns with events
+            days.forEach(day => {
+                dayColumnsHtml += renderDayColumn(day);
+            });
+
+            const html = `
+                <div class="calendar-wrapper">
+                    <div class="calendar-container">
+                        <div class="time-column">${timeColumnHtml}</div>
+                        <div class="day-columns">${dayColumnsHtml}</div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderDayColumn(day) {
+            const timedEvents = getTimedEventsForDay(day);
+            
+            // Calculate columns for overlapping events
+            const eventsWithLayout = calculateEventLayout(timedEvents, day);
+            
+            // Build hour grid lines
+            let gridHtml = '';
+            for (let hour = CONFIG.START_HOUR; hour < CONFIG.END_HOUR; hour++) {
+                gridHtml += `<div class="hour-line"></div>`;
+            }
+
+            // Add events as absolutely positioned elements
+            const eventsHtml = eventsWithLayout.map(eventLayout => 
+                renderTimedEvent(eventLayout.event, day, eventLayout.column, eventLayout.totalColumns)
+            ).join('');
+
+            return `
+                <div class="day-column">
+                    <div class="day-grid">
+                        ${gridHtml}
+                        ${eventsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateEventLayout(events, day) {
+            if (events.length === 0) return [];
+            
+            // Sort events by start time, then by duration (longer first)
+            const sortedEvents = events.slice().sort((a, b) => {
+                const aStart = new Date(a.start_dt).getTime();
+                const bStart = new Date(b.start_dt).getTime();
+                if (aStart !== bStart) return aStart - bStart;
+                
+                const aDuration = new Date(a.end_dt) - new Date(a.start_dt);
+                const bDuration = new Date(b.end_dt) - new Date(b.start_dt);
+                return bDuration - aDuration; // Longer events first
+            });
+
+            const columns = [];
+            const eventLayouts = [];
+
+            sortedEvents.forEach(event => {
+                const eventStart = new Date(event.start_dt);
+                const eventEnd = new Date(event.end_dt);
+
+                // Find a column where this event fits (doesn't overlap with existing events in that column)
+                let placed = false;
+                for (let colIndex = 0; colIndex < columns.length; colIndex++) {
+                    const column = columns[colIndex];
+                    const hasOverlap = column.some(existingEvent => {
+                        const existingStart = new Date(existingEvent.start_dt);
+                        const existingEnd = new Date(existingEvent.end_dt);
+                        return eventStart < existingEnd && eventEnd > existingStart;
+                    });
+
+                    if (!hasOverlap) {
+                        column.push(event);
+                        eventLayouts.push({
+                            event: event,
+                            column: colIndex,
+                            totalColumns: columns.length
+                        });
+                        placed = true;
+                        break;
+                    }
+                }
+
+                // If no existing column works, create a new column
+                if (!placed) {
+                    columns.push([event]);
+                    eventLayouts.push({
+                        event: event,
+                        column: columns.length - 1,
+                        totalColumns: columns.length
+                    });
+                }
+            });
+
+            // Update totalColumns for all events to reflect the maximum
+            const maxColumns = columns.length;
+            eventLayouts.forEach(layout => {
+                layout.totalColumns = maxColumns;
+            });
+
+            return eventLayouts;
+        }
+
+        function renderTimedEvent(event, day, column, totalColumns) {
+            const eventStart = new Date(event.start_dt);
+            const eventEnd = new Date(event.end_dt);
+            
+            // Calculate position and height
+            const dayStart = new Date(day);
+            dayStart.setHours(CONFIG.START_HOUR, 0, 0, 0);
+            
+            const startOffset = (eventStart - dayStart) / (1000 * 60); // minutes from day start
+            const duration = (eventEnd - eventStart) / (1000 * 60); // duration in minutes
+            
+            const top = (startOffset / 60) * CONFIG.HOUR_HEIGHT;
+            const height = Math.max((duration / 60) * CONFIG.HOUR_HEIGHT, 20); // minimum 20px
+            
+            // Calculate width and left position based on column
+            const columnWidth = 100 / totalColumns;
+            const left = (column / totalColumns) * 100;
+            // Add 1px gap between columns
+            const gapAdjustment = totalColumns > 1 ? 4 : 2;
+            
+            const subcal = subcalendars[event.subcalendar_ids[0]];
+            const subcalName = subcal ? subcal.name.toLowerCase() : '';
+            
+            let className = 'event';
+            let clickHandler = '';
+            const isFree = event.title.toUpperCase().includes('FREE');
+            const myBooking = isMyBooking(event);
+            
+            // Determine event type and styling
+            if (subcalName.includes('instructional')) {
+                className += ' instructional';
+                if (isFree) {
+                    className += ' free';
+                    clickHandler = `onclick='openBookingModal(${JSON.stringify(event).replace(/'/g, "&apos;")})'`;
+                } else if (myBooking) {
+                    className += ' my-booking';
+                }
+            } else if (subcalName.includes('duty pilot')) {
+                className += ' duty-pilot';
+            } else if (subcalName.includes('instructor')) {
+                className += ' instructor';
+            } else if (subcalName.includes('trial')) {
+                className += ' trial-flight';
+            } else if (subcalName.includes('member')) {
+                className += ' member';
+            } else if (subcalName.includes('visitor')) {
+                className += ' visitor';
+            } else if (subcalName.includes('tuggie')) {
+                className += ' tuggie';
+            }
+
+            const startTime = formatTime(event.start_dt);
+            const endTime = formatTime(event.end_dt);
+            
+            // Adjust font size for narrow events
+            const fontSize = totalColumns > 2 ? '0.65rem' : '0.75rem';
+            
+            // Format title with "who" field if it exists
+            let displayTitle = escapeHtml(event.title);
+            if (event.who && event.who.trim()) {
+                displayTitle += ` (${escapeHtml(event.who)})`;
+            }
+            
+            // Add cancel button for user's own bookings
+            let cancelButton = '';
+            if (myBooking) {
+                cancelButton = `<button class="btn-cancel-inline" onclick='event.stopPropagation(); cancelMyBooking(${JSON.stringify(event).replace(/'/g, "&apos;")})' title="Cancel my booking">✕</button>`;
+            }
+            
+            return `
+                <div class="${className}" ${clickHandler} 
+                     style="top: ${top}px; height: ${height}px; left: calc(${left}% + 2px); width: calc(${columnWidth}% - ${gapAdjustment}px); font-size: ${fontSize};"
+                     title="${escapeHtml(event.title)}${event.who ? ' (' + escapeHtml(event.who) + ')' : ''} (${startTime} - ${endTime})${myBooking ? ' - Click X to cancel' : ''}">
+                    ${cancelButton}
+                    <span class="event-time">${startTime}</span>
+                    <span class="event-title">${displayTitle}</span>
+                </div>
+            `;
+        }
+
+        function renderAllDayEvents(events) {
+            if (!events || events.length === 0) return '';
+            
+            return events.map(event => {
+                const subcal = subcalendars[event.subcalendar_ids[0]];
+                const subcalName = subcal ? subcal.name.toLowerCase() : '';
+                
+                let className = 'allday-event';
+                
+                if (subcalName.includes('instructional')) {
+                    className += ' instructional';
+                } else if (subcalName.includes('duty pilot')) {
+                    className += ' duty-pilot';
+                } else if (subcalName.includes('instructor')) {
+                    className += ' instructor';
+                } else if (subcalName.includes('club')) {
+                    className += ' club-event';
+                }
+
+                // Format title with "who" field if it exists
+                let displayTitle = escapeHtml(event.title);
+                if (event.who && event.who.trim()) {
+                    displayTitle += ` (${escapeHtml(event.who)})`;
+                }
+
+                return `
+                    <div class="${className}" title="${displayTitle}">
+                        ${displayTitle}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function isAllDayEvent(event) {
+            if (event.all_day) return true;
+            
+            const start = new Date(event.start_dt);
+            const end = new Date(event.end_dt);
+            
+            const startHour = start.getHours();
+            const startMin = start.getMinutes();
+            const endHour = end.getHours();
+            const endMin = end.getMinutes();
+            
+            if ((startHour === 0 && startMin === 0) && 
+                ((endHour === 23 && endMin >= 45) || (endHour === 0 && endMin === 0))) {
+                return true;
+            }
+            
+            return false;
+        }
+
+        function getAllDayEventsForDay(day) {
+            const dayStart = new Date(day);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(day);
+            dayEnd.setHours(23, 59, 59, 999);
+
+            return allEvents.filter(event => {
+                if (!isAllDayEvent(event)) return false;
+                
+                const eventStart = new Date(event.start_dt);
+                const eventEnd = new Date(event.end_dt);
+                
+                return eventStart <= dayEnd && eventEnd >= dayStart;
+            });
+        }
+
+        function getTimedEventsForDay(day) {
+            const dayStart = new Date(day);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(day);
+            dayEnd.setHours(23, 59, 59, 999);
+
+            return allEvents.filter(event => {
+                if (isAllDayEvent(event)) return false;
+                
+                const eventStart = new Date(event.start_dt);
+                const eventEnd = new Date(event.end_dt);
+                
+                return eventStart < dayEnd && eventEnd > dayStart;
+            });
+        }
+
+        // ============================================
+        // BOOKING FUNCTIONS
+        // ============================================
+        function openBookingModal(slot) {
+            currentSlot = slot;
+            const modal = document.getElementById('bookingModal');
+            const modalInfo = document.getElementById('modalSlotInfo');
+            
+            const startTime = formatTime(slot.start_dt);
+            const endTime = formatTime(slot.end_dt);
+            const date = formatDate(slot.start_dt);
+            
+            modalInfo.textContent = `${date} • ${startTime} - ${endTime}`;
+            modal.classList.add('active');
+            
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberName').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+            currentSlot = null;
+        }
+
+        async function confirmBooking() {
+            const memberName = document.getElementById('memberName').value.trim();
+            
+            if (!memberName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            if (!currentSlot) return;
+
+            try {
+                const updatedTitle = currentSlot.title.replace(/FREE/gi, memberName);
+                
+                // Send complete event object with just the title changed
+                const updateData = {
+                    id: currentSlot.id,
+                    subcalendar_ids: currentSlot.subcalendar_ids,
+                    start_dt: currentSlot.start_dt,
+                    end_dt: currentSlot.end_dt,
+                    all_day: currentSlot.all_day || false,
+                    title: updatedTitle
+                };
+
+                // Include optional fields if they exist
+                if (currentSlot.rrule) updateData.rrule = currentSlot.rrule;
+                if (currentSlot.notes) updateData.notes = currentSlot.notes;
+                if (currentSlot.location) updateData.location = currentSlot.location;
+                if (currentSlot.who) updateData.who = currentSlot.who;
+                
+                await apiRequest(`/events/${currentSlot.id}`, 'PUT', updateData);
+
+                // Save booking to localStorage
+                addMyBooking(currentSlot.id, memberName, updatedTitle);
+
+                closeModal();
+                alert(`✅ Booking confirmed for ${memberName}!\n\nYou can cancel this booking from this device anytime by clicking the X on the slot.`);
+                loadWeek();
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert(`❌ Booking failed: ${error.message}\n\nPlease try refreshing and booking again.`);
+            }
+        }
+
+        async function cancelMyBooking(event) {
+            const myBooking = isMyBooking(event);
+            
+            if (!myBooking) {
+                alert('This booking was not made from this browser.');
+                return;
+            }
+
+            const confirmCancel = confirm(`Cancel your booking?\n\n"${event.title}" will be changed back to FREE.`);
+            
+            if (!confirmCancel) return;
+
+            try {
+                // Replace the member name with FREE
+                // Try to find what was the original slot name
+                const updatedTitle = event.title.replace(myBooking.name, 'FREE');
+                
+                // Send complete event object with title changed back to FREE
+                const updateData = {
+                    id: event.id,
+                    subcalendar_ids: event.subcalendar_ids,
+                    start_dt: event.start_dt,
+                    end_dt: event.end_dt,
+                    all_day: event.all_day || false,
+                    title: updatedTitle
+                };
+
+                // Include optional fields if they exist
+                if (event.rrule) updateData.rrule = event.rrule;
+                if (event.notes) updateData.notes = event.notes;
+                if (event.location) updateData.location = event.location;
+                if (event.who) updateData.who = event.who;
+                
+                await apiRequest(`/events/${event.id}`, 'PUT', updateData);
+
+                // Remove from localStorage
+                removeMyBooking(event.id);
+
+                alert('✅ Booking cancelled! The slot is now FREE again.');
+                loadWeek();
+            } catch (error) {
+                console.error('Cancel error:', error);
+                alert(`❌ Cancellation failed: ${error.message}\n\nPlease try refreshing and cancelling again.`);
+            }
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatTime(datetime) {
+            const date = new Date(datetime);
+            return date.toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+        }
+
+        function formatDate(datetime) {
+            const date = new Date(datetime);
+            return date.toLocaleDateString('en-GB', { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateISO(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatHour(hour) {
+            return `${hour.toString().padStart(2, '0')}:00`;
+        }
+
+        function isToday_(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Modal click outside to close
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target.id === 'bookingModal') {
+                closeModal();
+            }
+        });
+
+        // Enter key to confirm
+        document.getElementById('memberName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                confirmBooking();
+            }
+        });
+
+        // Start the app
+        window.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
