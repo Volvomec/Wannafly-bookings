@@ -161,6 +161,7 @@
         .day-columns {
             display: grid;
             grid-template-columns: repeat(7, minmax(140px, 1fr));
+            grid-template-rows: auto auto 1fr;
             flex: 1;
         }
 
@@ -217,7 +218,7 @@
             font-weight: 600;
             color: var(--gray-600);
             border-bottom: 1px solid var(--border);
-            min-height: 40px;
+            height: 80px;
             background: var(--gray-50);
         }
 
@@ -226,7 +227,8 @@
             border-right: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
             background: var(--gray-50);
-            min-height: 40px;
+            height: 80px;
+            overflow-y: auto;
         }
 
         .time-slot {
@@ -1022,14 +1024,34 @@
             const eventEnd = new Date(event.end_dt);
             
             // Calculate position and height
+            // Use midnight of the day as reference
             const dayStart = new Date(day);
-            dayStart.setHours(CONFIG.START_HOUR, 0, 0, 0);
+            dayStart.setHours(0, 0, 0, 0);
             
-            const startOffset = (eventStart - dayStart) / (1000 * 60); // minutes from day start
-            const duration = (eventEnd - eventStart) / (1000 * 60); // duration in minutes
+            // Calculate minutes from midnight
+            const minutesFromMidnight = (eventStart - dayStart) / (1000 * 60);
+            const endMinutesFromMidnight = (eventEnd - dayStart) / (1000 * 60);
             
-            const top = (startOffset / 60) * CONFIG.HOUR_HEIGHT;
-            const height = Math.max((duration / 60) * CONFIG.HOUR_HEIGHT, 20); // minimum 20px
+            // Calculate minutes from calendar start (e.g., 09:00)
+            const calendarStartMinutes = CONFIG.START_HOUR * 60;
+            let startOffsetMinutes = minutesFromMidnight - calendarStartMinutes;
+            
+            // Calculate duration in minutes
+            const duration = (eventEnd - eventStart) / (1000 * 60);
+            
+            // If event starts before calendar start, clamp to top
+            let top = (startOffsetMinutes / 60) * CONFIG.HOUR_HEIGHT;
+            let height = (duration / 60) * CONFIG.HOUR_HEIGHT;
+            
+            if (startOffsetMinutes < 0) {
+                // Event starts before visible calendar
+                // Clamp to top and adjust height
+                const visibleDuration = endMinutesFromMidnight - calendarStartMinutes;
+                top = 0;
+                height = (visibleDuration / 60) * CONFIG.HOUR_HEIGHT;
+            }
+            
+            height = Math.max(height, 20); // minimum 20px
             
             // Calculate width and left position based on column
             const columnWidth = 100 / totalColumns;
